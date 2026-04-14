@@ -6,9 +6,8 @@
 // 1. マップの初期化
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
 
-// 2. 総指揮官専用のカスタムマップ（真のID: 019d8b1d... を使用）
-// 🚨 key= の後ろの【】部分を、ご自身の新しいAPIキーに書き換えてください。
-const customMap = L.tileLayer('https://api.maptiler.com/maps/019d8b1d-1989-74cd-b70b-2ba296c30f3e/256/{z}/{x}/{y}.png?key=GloGcr9XQvZ6g4JrFj0x', {
+// 🚨 マップIDは 019d... で固定！キーを無傷の「Default key」に変更！
+const customMap = L.tileLayer('https://api.maptiler.com/maps/019d8b1d-1989-74cd-b70b-2ba296c30f3e/256/{z}/{x}/{y}.png?key=ntxdOC9g4hEHBTx8YXrP&v=3', {
     maxZoom: 19,
     attribution: '© <a href="https://www.maptiler.com/">MapTiler</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 });
