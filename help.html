@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>アプリの使用方法について - 旅人の杖と救いの泉</title>
+    <style>
+        :root {
+            --primary-color: #1565C0;
+            --accent-color: #E65100;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h1 { margin: 0; font-size: 1.5rem; }
+        h2 {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            border-left: 5px solid var(--primary-color);
+            padding-left: 10px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .icon-box {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        .icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            min-width: 30px;
+            text-align: center;
+        }
+        .warning-card {
+            border: 2px solid #ffccbc;
+            background-color: #fff5f2;
+        }
+        .warning-title {
+            color: #d84315;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        ul { padding-left: 20px; margin: 0; }
+        li { margin-bottom: 8px; }
+        b { color: #000; }
+        
+        .footer-btns {
+            margin-top: 40px;
+            padding-bottom: 60px;
+            text-align: center;
+        }
+        .close-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(21, 101, 192, 0.3);
+            transition: transform 0.2s;
+            width: 80%;
+        }
+        .close-btn:active { transform: scale(0.95); }
+        
+        hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>アプリの使用方法について</h1>
+    <p style="margin-top:10px; opacity: 0.9;">旅人の杖と救いの泉 探索マニュアル</p>
+</header>
+
+<div class="container">
+
+    <div class="card">
+        <p>『旅人の杖と救いの泉』へようこそ。ここではアプリの基本的な使い方と機能について解説します。</p>
+    </div>
+
+    <h2>1. 基本の探索フロー</h2>
+    <div class="card">
+        <ul>
+            <li><b>地図を動かす:</b> 探索したいエリアを表示するか、右上の「🧭」ボタンで現在地に飛びます。</li>
+            <li><b>メニューを開く:</b> 左上の「☰」ボタンから、対象にチェックを入れます。（※広域データやルートなどは即時表示されます）</li>
+            <li><b>スキャン実行:</b> 下部の「周辺をスキャン」ボタンを押すと、画面内の候補がピンとして出現します。</li>
+            <li><b>詳細を見る:</b> ピンやルートをタップすると、名称や詳細を確認できます。</li>
+        </ul>
+    </div>
+
+    <h2>2. 画面とボタンの見方</h2>
+    <div class="card">
+        <div class="icon-box">
+            <div class="icon">☰</div>
+            <div><b>探索メニュー（左上）</b><br>ジャンルをON/OFFできるフィルターです。</div>
+        </div>
+        <div class="icon-box">
+            <div class="icon">🧭</div>
+            <div><b>現在地ボタン（右上）</b><br>ワンタップで自分の現在地にカメラが戻ります。</div>
+        </div>
+        <div class="icon-box">
+            <div class="icon">📡</div>
+            <div><b>周辺をスキャン（下部）</b><br>メインエンジンです。画面内の候補を一斉に索敵します。※広域すぎるとボタンは押せません。</div>
+        </div>
+        <div class="icon-box">
+            <div class="icon">❓📜</div>
+            <div><b>各種ボタン（右下）</b><br>ヘルプ画面とライセンス画面を開きます。</div>
+        </div>
+    </div>
+
+    <h2>3. マップ上の表示について</h2>
+    <div class="card">
+        <p>🔵 <b>青いピン（基本探索）:</b> 道標、公園・遊具など。</p>
+        <p>🟢 <b>緑のピン（施設・文化財）:</b> 公共施設、文化施設、文化財など。</p>
+        <p>🟠 <b>オレンジのピン:</b> 喫茶店・レストラン。※後述の注意参照</p>
+        <p>🟣 <b>紫のピン・線:</b> トレイル・古道などのルート。※後述の注意参照</p>
+        <p>🗺️ <b>色付きエリア:</b> 景観地区、歴史的風土保存区域などの指定範囲。</p>
+        <p>⭕ <b>赤い丸:</b> 公衆トイレ。</p>
+    </div>
+
+    <h2>4. ⚠️ 重要：ご利用上の注意</h2>
+    <div class="card warning-card">
+        <div class="warning-title">【トレイル・古道・自然歩道】</div>
+        <p style="font-size: 0.95rem;">
+            本格的な登山道や通り抜け困難な難所が含まれる場合があります。探索の際は<b>必ず事前のルート計画と装備の準備</b>を行い、周囲の人に<b>「どこへ行くか」を一声かけてから</b>出発してください。
+        </p>
+        <hr>
+        <div class="warning-title">【喫茶店・レストラン】</div>
+        <p style="font-size: 0.95rem;">
+            住所を座標に変換しているため、実際の場所から<b>最大で10m程度の誤差</b>が生じることがあります。現地では周囲の状況や最新の営業状態を十分に確認してください。
+        </p>
+    </div>
+
+    <h2>5. 🚾 トイレモードと調査機能</h2>
+    <div class="card">
+        <p>メニュー内の「トイレ」スイッチをONにすると、現在範囲のトイレ（赤い丸）が浮かび上がります。</p>
+        <p>「トイレについて連絡」ボタンで、現在地の座標をメールで報告できます。「壊れている」「載っていない」等の情報提供にご協力ください。</p>
+        <p style="font-size: 0.8rem; color: #666;">※緊急時は警察・救急へご連絡ください。</p>
+    </div>
+
+    <h2>6. 💡 快適な探索のために</h2>
+    <div class="card">
+        <p>本アプリは<b>「PWA」</b>に対応しています。ブラウザのメニューから<b>「ホーム画面に追加」</b>を実行してください。全画面でより高速に動作します！</p>
+    </div>
+
+    <h2>7. アプリの削除とデータについて</h2>
+    <div class="card">
+        <p><b>📱 アイコンの削除:</b> ホーム画面のアイコンを長押しで消去できます。</p>
+        <p><b>⚠️ キャッシュについて:</b> データを端末に一時保存（キャッシュ）することで高速化しています。動作が重い場合はブラウザの履歴消去でキャッシュを消すと改善します。</p>
+    </div>
+
+    <div class="footer-btns">
+        <button onclick="window.location.href='index.html';" class="close-btn">マップへ戻る</button>
+    </div>
+
+</div>
+
+</body>
+</html>
