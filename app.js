@@ -1,14 +1,16 @@
 /**
- * 旅人の杖と救いの泉 Ver 2.1.0
- * 総指揮官専用・MapTilerカスタムマップ完全統合版
+ * 旅人の杖と救いの泉 Ver 3.0.0 (Vector SDK 突破版)
+ * MapTiler公式SDK完全統合版
  */
 
 // 1. マップの初期化
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
 
-const customMap = L.tileLayer('https://api.maptiler.com/maps/019d8b1d-1989-74cd-b70b-2ba296c30f3e/256/{z}/{x}/{y}.png?key=GloGcr9XQvZ6g4JrFj0x', {
-  maxZoom: 19,
-  attribution: '© <a href="https://www.maptiler.com/">MapTiler</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+// 2. MapTiler SDK を使ったカスタムマップ（Vector方式）
+const MAPTILER_KEY = 'GloGcr9XQvZ6g4JrFj0x';
+const customMap = new L.MaptilerLayer({
+    apiKey: MAPTILER_KEY,
+    style: 'https://api.maptiler.com/maps/019d8b1d-1989-74cd-b70b-2ba296c30f3e/style.json'
 });
 
 // カスタムマップを画面に表示
@@ -102,7 +104,6 @@ const overlayMaps = {
 layers.rel.addTo(map); layers.park.addTo(map); layers.com.addTo(map);
 layers.mus.addTo(map); layers.gym.addTo(map); layers.cul.addTo(map);
 
-// コントロールを追加（第一引数を null にすることで背景切り替えを非表示にする）
 L.control.layers(null, overlayMaps, {collapsed: false, position: 'topleft'}).addTo(map);
 
 // 10. 見出しの挿入ロジック
