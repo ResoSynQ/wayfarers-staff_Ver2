@@ -4,16 +4,16 @@
  */
 
 // 🔑 MapTiler APIキー（ここに自分のキーを入れてください）
-const MAPTILER_API_KEY = "ntxdOC9g4hEHBTx8YXrP";
+const MAPTILER_API_KEY = "ここにあなたのMapTiler APIキーを入力";
 
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
 
 // 🗺️ MapTiler ラスタータイル ベースマップ
-const mtCustom = L.tileLayer(`https://api.maptiler.com/maps/019d8b1d-1989-74cd-b70b-2ba296c30f3e/256/{z}/{x}/{y}@2x.png?key=${MAPTILER_API_KEY}`, { maxZoom: 19, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>', tileSize: 512, zoomOffset: -1 }).addTo(map);
-const mtStreets = L.tileLayer(`https://api.maptiler.com/maps/streets-v2/256/{z}/{x}/{y}@2x.png?key=${MAPTILER_API_KEY}`, { maxZoom: 19, attribution: '&copy; MapTiler &copy; OSM', tileSize: 512, zoomOffset: -1 });
-const mtTopo = L.tileLayer(`https://api.maptiler.com/maps/topo-v2/256/{z}/{x}/{y}@2x.png?key=${MAPTILER_API_KEY}`, { maxZoom: 19, attribution: '&copy; MapTiler &copy; OSM', tileSize: 512, zoomOffset: -1 });
-const mtSatellite = L.tileLayer(`https://api.maptiler.com/maps/hybrid/256/{z}/{x}/{y}@2x.png?key=${MAPTILER_API_KEY}`, { maxZoom: 19, attribution: '&copy; MapTiler &copy; OSM', tileSize: 512, zoomOffset: -1 });
-const mtOutdoor = L.tileLayer(`https://api.maptiler.com/maps/outdoor-v2/256/{z}/{x}/{y}@2x.png?key=${MAPTILER_API_KEY}`, { maxZoom: 19, attribution: '&copy; MapTiler &copy; OSM', tileSize: 512, zoomOffset: -1 });
+const mtCustom = L.tileLayer(`https://api.maptiler.com/maps/019d8b1d-1989-74cd-b70b-2ba296c30f3e/{z}/{x}/{y}.png?key=${MAPTILER_API_KEY}`, { maxZoom: 19, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' }).addTo(map);
+const mtStreets = L.tileLayer(`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${MAPTILER_API_KEY}`, { maxZoom: 19, attribution: '&copy; MapTiler &copy; OSM' });
+const mtTopo = L.tileLayer(`https://api.maptiler.com/maps/topo-v2/{z}/{x}/{y}.png?key=${MAPTILER_API_KEY}`, { maxZoom: 19, attribution: '&copy; MapTiler &copy; OSM' });
+const mtSatellite = L.tileLayer(`https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.png?key=${MAPTILER_API_KEY}`, { maxZoom: 19, attribution: '&copy; MapTiler &copy; OSM' });
+const mtOutdoor = L.tileLayer(`https://api.maptiler.com/maps/outdoor-v2/{z}/{x}/{y}.png?key=${MAPTILER_API_KEY}`, { maxZoom: 19, attribution: '&copy; MapTiler &copy; OSM' });
 // 📡 OSMフォールバック（オフライン・圏外時）
 const osmFallback = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' });
 
