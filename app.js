@@ -1,17 +1,17 @@
 /**
- * 旅人の杖と救いの泉 Ver 2.0.23-Topo-Turbo
- * 安定版ベース + MapTiler Topo 爆速先読み設定
+ * 旅人の杖と救いの泉 Ver 2.0.24
+ * 歴史的風致名称修正 ＆ ピン表示復活 ＆ 高速化設定
  */
 
 // 1. マップの初期化
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
 
-// 🚨 背景地図：MapTiler Topo (先読み設定を追加してヌルヌル化！)
+// 背景地図：MapTiler Topo (爆速先読み設定)
 L.tileLayer('https://api.maptiler.com/maps/topo-v4/256/{z}/{x}/{y}.png?key=fRFSjkIcQ3GPpvRyLzxa', {
     maxZoom: 19,
-    keepBuffer: 8,         // 💡 画面外の地図も裏で先読みしてストック
-    updateWhenIdle: false, // 💡 スクロール中も休まず画像を読み込み続ける
-    attribution: '© <a href="https://www.maptiler.com/">MapTiler</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    keepBuffer: 8,
+    updateWhenIdle: false,
+    attribution: '© <a href="https://www.maptiler.com/">MapTiler</a> contributors'
 }).addTo(map);
 
 map.attributionControl.setPosition('bottomleft');
@@ -24,10 +24,11 @@ const icons = {
     orange: new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] })
 };
 
-// 3. 名称取得の補助関数
+// 3. 名称取得の補助関数（バグ修正：A44_005 などの特殊項目に対応！）
 function getFeatureName(p) {
     if (!p) return "名称未定";
-    let name = p.name || p.名称 || p.屋号 || p.地区名 || p.観光資源名 || p.指定名称 || p.文化財名 || p.通称 || "名称未定";
+    let name = p.name || p.名称 || p.屋号 || p.地区名 || p.観光資源名 || p.指定名称 || p.文化財名 || p.通称 || 
+               p.A44_005 || p.A43_004 || p.A35b_003 || p.P12_002 || "名称未定";
     if (String(name) === "0" || name === "" || name === null) name = "名称未定";
     return name;
 }
@@ -63,7 +64,8 @@ const layerDefs = {
     gokaido: { url: 'gokaido_routes.geojson', style: getRouteStyle }
 };
 
-const immediateLayers = ['keikan', 'tree', 'fudo', 'denken', 'fuchi', 'kanko', 'trail', 'shizenhodo', 'gokaido'];
+// 💡 修正：ピン関係（rel, park, com...）も immediateLayers（初回読み込み）に追加して復活させたぜ！
+const immediateLayers = ['rel', 'park', 'com', 'mus', 'gym', 'cul', 'wc', 'keikan', 'tree', 'fudo', 'denken', 'fuchi', 'kanko', 'trail', 'shizenhodo', 'gokaido'];
 const rawData = {}; const layers = {};
 Object.keys(layerDefs).forEach(key => { layers[key] = L.layerGroup(); });
 
@@ -82,7 +84,12 @@ function renderGeoJson(key, bounds = null) {
             return L.marker(latlng, { icon: def.icon || new L.Icon.Default() });
         },
         style: def.style,
-        onEachFeature: function(feature, layer) { layer.bindPopup(`<strong>${getFeatureName(feature.properties)}</strong>`); }
+        onEachFeature: function(feature, layer) { 
+            const name = getFeatureName(feature.properties);
+            layer.bindPopup(`<strong>${name}</strong>`); 
+            // 面積レイヤーにはツールチップ（ホバーで表示）も追加
+            if (def.style) { layer.bindTooltip(name, { sticky: true }); }
+        }
     }).addTo(layers[key]);
 }
 
@@ -104,7 +111,11 @@ const overlayMaps = {
     "🍽️ 喫茶店・レストラン": layers.restaurants, "🐾 トレイル.古道": layers.trail, "🛤️ 東海自然歩道": layers.shizenhodo, "🛣️ 五街道": layers.gokaido
 };
 
+// 初期表示の設定
 layers.rel.addTo(map); layers.park.addTo(map); layers.com.addTo(map);
+layers.mus.addTo(map); layers.gym.addTo(map); layers.cul.addTo(map);
+layers.wc.addTo(map); // トイレも最初から表示
+
 L.control.layers(null, overlayMaps, {collapsed: false, position: 'topleft'}).addTo(map);
 
 // 9. カテゴリ見出し
@@ -122,7 +133,7 @@ function insertCategoryHeaders() {
 insertCategoryHeaders();
 map.on('layeradd layerremove', () => setTimeout(insertCategoryHeaders, 10));
 
-// 10. スキャン機能
+// 10. スキャン機能（広域データ用）
 const SCAN_ZOOM = 15;
 const scanBtn = document.getElementById('scan-btn');
 function updateScanBtn() {
@@ -138,12 +149,12 @@ scanBtn?.addEventListener('click', () => {
     scanBtn.innerText = "🔄 スキャン中..."; scanBtn.classList.add('disabled');
     const bounds = map.getBounds();
     setTimeout(() => {
-        Object.keys(layerDefs).forEach(key => { if (!immediateLayers.includes(key) && map.hasLayer(layers[key]) && rawData[key]) renderGeoJson(key, bounds); });
+        Object.keys(layerDefs).forEach(key => { if (map.hasLayer(layers[key]) && rawData[key]) renderGeoJson(key, bounds); });
         scanBtn.innerText = "📡 周囲をスキャン"; scanBtn.classList.remove('disabled');
     }, 600);
 });
 
-// 11. UI
+// 11. UI制御
 document.getElementById('menu-btn')?.addEventListener('click', (e) => { e.stopPropagation(); document.body.classList.toggle('menu-open'); });
 document.getElementById('help-btn')?.addEventListener('click', () => { window.location.href = "help.html"; });
 document.getElementById('license-btn')?.addEventListener('click', () => { window.location.href = "license.html"; });
