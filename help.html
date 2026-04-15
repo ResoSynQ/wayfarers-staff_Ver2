@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>アプリの使用方法について - 旅人の杖と救いの泉(関西版)</title>
+    <title>アプリの使用方法について - 旅人の杖と救いの泉</title>
     <style>
         :root {
             --primary-color: #1565C0;
@@ -97,19 +97,36 @@
         .close-btn:active { transform: scale(0.95); }
         
         hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
+
+        /* トイレ連絡ボタン用のCSS */
+        .contact-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin: 15px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: background-color 0.2s;
+        }
+        .contact-btn:hover { background-color: #0d47a1; }
     </style>
 </head>
 <body>
 
 <header>
     <h1>アプリの使用方法について</h1>
-    <p style="margin-top:10px; opacity: 0.9;">旅人の杖と救いの泉 探索マニュアル</p>
+    <p style="margin-top:10px; opacity: 0.9;">旅人の杖-Wayfarer's Staff-（関西版）マニュアル</p>
 </header>
 
 <div class="container">
 
     <div class="card">
-        <p>『旅人の杖と救いの泉』へようこそ。ここではアプリの基本的な使い方と機能について解説します。</p>
+        <p>『旅人の杖（関西版）』へようこそ。ここではアプリの基本的な使い方と機能について解説します。</p>
     </div>
 
     <h2>1. 基本の探索フロー</h2>
@@ -168,8 +185,11 @@
     <h2>5. 🚾 トイレモードと調査機能</h2>
     <div class="card">
         <p>メニュー内の「トイレ」スイッチをONにすると、現在範囲のトイレ（赤い丸）が浮かび上がります。</p>
-        <p>「トイレについて連絡」ボタンで、現在地の座標をメールで報告できます。「壊れている」「載っていない」等の情報提供にご協力ください。</p>
-        <p style="font-size: 0.8rem; color: #666;">※緊急時は警察・救急へご連絡ください。</p>
+        
+        <p>現在地の座標をメールで報告できます。「壊れている」「載っていない」等の情報提供にご協力ください。</p>
+        <button id="toilet-contact-btn" class="contact-btn">✉️ トイレについて連絡</button>
+        
+        <p style="font-size: 0.8rem; color: #666; margin-top: 15px;">※緊急時は警察・救急へご連絡ください。</p>
     </div>
 
     <h2>6. 💡 快適な探索のために</h2>
@@ -188,6 +208,51 @@
     </div>
 
 </div>
+
+<script>
+    document.getElementById('toilet-contact-btn').addEventListener('click', function() {
+        const btn = this;
+        // GPSが使えるかチェック
+        if ("geolocation" in navigator) {
+            btn.innerText = "🔄 座標を取得中...";
+            
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    // 座標の取得成功！
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    // メールの件名と本文をセット
+                    const subject = encodeURIComponent("トイレ情報提供（旅人の杖 関西版）");
+                    const body = encodeURIComponent(
+                        "【トイレに関する情報提供】\n\n" +
+                        "現在地の座標：\n" +
+                        "緯度: " + lat + "\n" +
+                        "経度: " + lng + "\n\n" +
+                        "▼Googleマップで位置を確認\n" +
+                        "https://www.google.com/maps?q=" + lat + "," + lng + "\n\n" +
+                        "状況を下記にご記入ください：\n" +
+                        "（例：トイレが閉鎖されている、新しいトイレがある、など）\n\n"
+                    );
+                    
+                    // メールアプリを起動！
+                    window.location.href = "mailto:information.app.excellent@gmail.com?subject=" + subject + "&body=" + body;
+                    
+                    // ボタンのテキストを戻す
+                    btn.innerText = "✉️ トイレについて連絡";
+                },
+                function(error) {
+                    // エラー処理
+                    alert("位置情報が取得できませんでした。端末の設定で位置情報サービスがオンになっているか確認してください。");
+                    btn.innerText = "✉️ トイレについて連絡";
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } // 高精度で取得
+            );
+        } else {
+            alert("お使いのブラウザは位置情報に対応していません。");
+        }
+    });
+</script>
 
 </body>
 </html>
