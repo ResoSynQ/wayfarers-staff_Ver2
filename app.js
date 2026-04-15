@@ -4,7 +4,7 @@
  */
 
 // 🔑 MapTiler APIキー（ここに自分のキーを入れてください）
-const MAPTILER_API_KEY = "ここにあなたのMapTiler APIキーを入力";
+const MAPTILER_API_KEY = "ntxdOC9g4hEHBTx8YXrP";
 
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
 
