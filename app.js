@@ -1,31 +1,10 @@
 /**
- * 旅人の杖と救いの泉 Ver 2.1.0
- * メインロジック（MapTiler ベクトルタイル対応版）
+ * 旅人の杖と救いの泉 Ver 2.0.22
+ * メインロジック（東海自然歩道・本線緑/支線青 完璧塗り分け版）
  */
 
-// 🔑 MapTiler APIキー（ここに自分のキーを入れてください）
-const MAPTILER_API_KEY = "ntxdOC9g4hEHBTx8YXrP";
-
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
-
-// 🗺️ MapTiler ラスタータイル ベースマップ
-const mtCustom = L.tileLayer(`https://api.maptiler.com/maps/019d8b1d-1989-74cd-b70b-2ba296c30f3e/{z}/{x}/{y}.png?key=${MAPTILER_API_KEY}`, { maxZoom: 19, attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>' }).addTo(map);
-const mtStreets = L.tileLayer(`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${MAPTILER_API_KEY}`, { maxZoom: 19, attribution: '&copy; MapTiler &copy; OSM' });
-const mtTopo = L.tileLayer(`https://api.maptiler.com/maps/topo-v2/{z}/{x}/{y}.png?key=${MAPTILER_API_KEY}`, { maxZoom: 19, attribution: '&copy; MapTiler &copy; OSM' });
-const mtSatellite = L.tileLayer(`https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.png?key=${MAPTILER_API_KEY}`, { maxZoom: 19, attribution: '&copy; MapTiler &copy; OSM' });
-const mtOutdoor = L.tileLayer(`https://api.maptiler.com/maps/outdoor-v2/{z}/{x}/{y}.png?key=${MAPTILER_API_KEY}`, { maxZoom: 19, attribution: '&copy; MapTiler &copy; OSM' });
-// 📡 OSMフォールバック（オフライン・圏外時）
-const osmFallback = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' });
-
-const baseMaps = {
-    "🎨 カスタム（メイン）": mtCustom,
-    "🗺️ Streets（標準）": mtStreets,
-    "⛰️ Topo（地形）": mtTopo,
-    "🛰️ Satellite（衛星）": mtSatellite,
-    "🥾 Outdoor（アウトドア）": mtOutdoor,
-    "📡 OSM（オフライン用）": osmFallback
-};
-
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' }).addTo(map);
 map.attributionControl.setPosition('bottomleft');
 
 const icons = {
@@ -154,19 +133,14 @@ const overlayMaps = {
 layers.rel.addTo(map); layers.park.addTo(map); layers.com.addTo(map);
 layers.mus.addTo(map); layers.gym.addTo(map); layers.cul.addTo(map);
 
-L.control.layers(baseMaps, overlayMaps, {collapsed: false, position: 'topleft'}).addTo(map);
+L.control.layers({}, overlayMaps, {collapsed: false, position: 'topleft'}).addTo(map);
 
 function insertCategoryHeaders() {
     document.querySelectorAll('.custom-layer-header').forEach(el => el.remove());
-    // ベースマップセクションにヘッダー追加
-    const baseSection = document.querySelector('.leaflet-control-layers-base');
-    if (baseSection && !baseSection.previousElementSibling?.classList?.contains('custom-layer-header')) {
-        baseSection.insertAdjacentHTML('beforebegin', "<div class='custom-layer-header' style='font-size:1.05em; font-weight:bold; color:#6A1B9A; margin-top:5px; margin-bottom:10px;'>【ベースマップ】</div>");
-    }
     document.querySelectorAll('.leaflet-control-layers-overlays label').forEach(label => {
         const text = label.textContent.trim();
         let headerHtml = "";
-        if (text.includes("道標")) headerHtml = "<div class='custom-layer-header' style='margin:18px 0 10px 0;'><hr style='margin:0 0 12px 0; border:0; border-top:1px solid #ddd;'><div style='font-size:1.05em; font-weight:bold; color:#1565C0;'>【基本探索】</div></div>";
+        if (text.includes("道標")) headerHtml = "<div class='custom-layer-header' style='font-size:1.05em; font-weight:bold; color:#1565C0; margin-top:5px; margin-bottom:10px;'>【基本探索】</div>";
         else if (text.includes("景観地区")) headerHtml = "<div class='custom-layer-header' style='margin:18px 0 10px 0;'><hr style='margin:0 0 12px 0; border:0; border-top:1px solid #ddd;'><div style='font-size:1.05em; font-weight:bold; color:#E65100;'>【広域地域データ】</div></div>";
         else if (text.includes("喫茶店")) headerHtml = "<div class='custom-layer-header' style='margin:18px 0 10px 0;'><hr style='margin:0 0 12px 0; border:0; border-top:1px solid #ddd;'><div style='font-size:1.05em; font-weight:bold; color:#2E7D32;'>【上級者向け】</div></div>";
         if (headerHtml) label.insertAdjacentHTML('beforebegin', headerHtml);
