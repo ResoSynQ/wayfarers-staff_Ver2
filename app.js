@@ -1,17 +1,26 @@
 /**
- * 旅人の杖と救いの泉 Ver 3.0.0
- * Vector SDK 安定版
+ * 旅人の杖と救いの泉 Ver 3.0.1
+ * 無敵ローディング & Vector SDK 完全対応版
  */
+
+// 0. 絶対にローディングを消す処理（一番上に配置してエラーによるフリーズを防止！）
+function hideLoadingScreen() {
+    const s = document.getElementById('loading-screen');
+    if(s && s.style.display !== 'none') { s.style.opacity = '0'; setTimeout(() => s.style.display = 'none', 800); }
+}
+window.addEventListener('load', () => setTimeout(hideLoadingScreen, 1500));
+setTimeout(hideLoadingScreen, 4000);
 
 // 1. マップの初期化
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
 
-// 2. MapTiler SDK レイヤー（Vector方式）
-// 🚨 key= の後ろに、ご自身のAPIキーを貼り付けてください。
-const MAPTILER_KEY = 'GloGcr9XQvZ6g4JrFj0x';
+// 2. MapTiler SDK レイヤー
+// 🚨 ここは 'xxxxxxxx' ではなく、MapTilerの「本物のAPIキー」を入れてくれ！
+const MAPTILER_KEY = 'GloGcr9XQvZ6g4JrFj0x'; 
 const customMap = L.maptilerLayer({
     apiKey: MAPTILER_KEY,
-    style: 'https://api.maptiler.com/maps/019d8b1d-1989-74cd-b70b-2ba296c30f3e/style.json'
+    // 💡 SDKの正式な書き方：URL全部ではなく「マップIDのみ」を指定する！
+    style: '019d8b1d-1989-74cd-b70b-2ba296c30f3e' 
 });
 
 customMap.addTo(map);
@@ -146,14 +155,6 @@ document.getElementById('menu-btn')?.addEventListener('click', (e) => { e.stopPr
 document.getElementById('help-btn')?.addEventListener('click', () => { window.location.href = "help.html"; });
 document.getElementById('license-btn')?.addEventListener('click', () => { window.location.href = "license.html"; });
 document.getElementById('location-btn')?.addEventListener('click', () => { map.locate({setView: true, maxZoom: 16}); });
-
-// 13. ローディング
-function hideLoadingScreen() {
-    const s = document.getElementById('loading-screen');
-    if(s && s.style.display !== 'none') { s.style.opacity = '0'; setTimeout(() => s.style.display = 'none', 800); }
-}
-window.addEventListener('load', () => setTimeout(hideLoadingScreen, 1500));
-setTimeout(hideLoadingScreen, 4000);
 
 // 14. 位置情報
 map.on('locationfound', (e) => { L.circleMarker(e.latlng, {radius: 8, fillColor: '#007BFF', color: '#fff', weight: 2, fillOpacity: 1}).addTo(map).bindPopup("現在地").openPopup(); });
