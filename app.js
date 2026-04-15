@@ -7,7 +7,7 @@
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
 
 // 🚨 背景地図を MapTiler Topo に差し替え（制限なしの Default Key を使用）
-L.tileLayer('https://api.maptiler.com/maps/topo-v4/256/{z}/{x}/{y}.png?key=giKjc4S67iT68mKNo7eB', {
+L.tileLayer('https://api.maptiler.com/maps/topo-v4/256/{z}/{x}/{y}.png?key=giKJc4mfVL5GMscQ4YZN', {
     maxZoom: 19,
     attribution: '© <a href="https://www.maptiler.com/">MapTiler</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
