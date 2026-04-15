@@ -1,9 +1,9 @@
 /**
- * 旅人の杖と救いの泉 Ver 2.0.26
- * 3秒ローディング維持 & 復帰時スキップ機能搭載
+ * 旅人の杖と救いの泉 Ver 2.0.27
+ * 安定版（OSM）ベース + 名称バグ修正 + ピン復活 + ローディング制御
  */
 
-// --- 🚨 ローディング制御（最優先） ---
+// --- ローディング制御 ---
 function hideLoadingScreen() {
     const s = document.getElementById('loading-screen');
     if(s && s.style.display !== 'none') { 
@@ -11,20 +11,16 @@ function hideLoadingScreen() {
         setTimeout(() => s.style.display = 'none', 800); 
     }
 }
-
-// 復帰時（?skip=1）はローディングを即座に消す、それ以外は3秒（3000ms）見せる
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('skip') === '1') {
     const s = document.getElementById('loading-screen');
     if(s) s.style.display = 'none';
 } else {
-    // 画面が読み込まれてから3秒後に消去開始
     window.addEventListener('load', () => setTimeout(hideLoadingScreen, 3000));
-    // 念のための強制解除（5秒）
     setTimeout(hideLoadingScreen, 5000);
 }
 
-// 1. マップの初期化
+// 1. マップの初期化（安定版のOSM）
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' }).addTo(map);
 map.attributionControl.setPosition('bottomleft');
@@ -37,13 +33,17 @@ const icons = {
     orange: new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] })
 };
 
+// 3. 🚨 名称取得の補助関数（計画名称・特殊コードを復活！）
 function getFeatureName(p) {
     if (!p) return "名称未定";
-    let name = p.name || p.名称 || p.屋号 || p.地区名 || p.観光資源名 || p.指定名称 || p.文化財名 || p.通称 || "名称未定";
+    let name = p.計画名称 || p.計画名 || p.A44_002 || p.name || p.名称 || p.屋号 || 
+               p.地区名 || p.観光資源名 || p.指定名称 || p.文化財名 || p.通称 || 
+               p.A44_005 || p.A43_004 || p.A35b_003 || p.P12_002 || "名称未定";
     if (String(name) === "0" || name === "" || name === null) name = "名称未定";
     return name;
 }
 
+// 4. ルート（線）のスタイル設定
 function getRouteStyle(feature) {
     const name = getFeatureName(feature.properties);
     if (name.includes("東海自然歩道本線以外")) return { color: "#0052cc", weight: 4, opacity: 0.8 }; 
@@ -53,6 +53,7 @@ function getRouteStyle(feature) {
     return { color: "#FF1493", weight: 4, opacity: 0.8 };
 }
 
+// 5. レイヤーの定義（ファイル名は安定版のもの）
 const layerDefs = {
     rel: { url: 'OSM_relics_of_kinki_38142.geojson', icon: icons.blue },
     park: { url: 'Gov-OSM_Park_30m_merge_17323.geojson', icon: icons.blue },
@@ -73,7 +74,8 @@ const layerDefs = {
     gokaido: { url: 'gokaido_routes.geojson', style: getRouteStyle }
 };
 
-const immediateLayers = ['keikan', 'tree', 'fudo', 'denken', 'fuchi', 'kanko', 'trail', 'shizenhodo', 'gokaido'];
+// 🚨 ピン（rel, park, wc等）を初回読み込み対象に復活！
+const immediateLayers = ['rel', 'park', 'com', 'mus', 'gym', 'cul', 'wc', 'keikan', 'tree', 'fudo', 'denken', 'fuchi', 'kanko', 'trail', 'shizenhodo', 'gokaido'];
 const rawData = {}; const layers = {};
 Object.keys(layerDefs).forEach(key => { layers[key] = L.layerGroup(); });
 
@@ -91,7 +93,11 @@ function renderGeoJson(key, bounds = null) {
             return L.marker(latlng, { icon: def.icon || new L.Icon.Default() });
         },
         style: def.style,
-        onEachFeature: function(feature, layer) { layer.bindPopup(`<strong>${getFeatureName(feature.properties)}</strong>`); }
+        onEachFeature: function(feature, layer) { 
+            const name = getFeatureName(feature.properties);
+            layer.bindPopup(`<strong>${name}</strong>`); 
+            if (def.style) { layer.bindTooltip(name, { sticky: true }); }
+        }
     }).addTo(layers[key]);
 }
 
@@ -111,7 +117,11 @@ const overlayMaps = {
     "🍽️ 喫茶店・レストラン": layers.restaurants, "🐾 トレイル.古道": layers.trail, "🛤️ 東海自然歩道": layers.shizenhodo, "🛣️ 五街道": layers.gokaido
 };
 
+// 🚨 初期表示にピン類とトイレをセット！
 layers.rel.addTo(map); layers.park.addTo(map); layers.com.addTo(map);
+layers.mus.addTo(map); layers.gym.addTo(map); layers.cul.addTo(map);
+layers.wc.addTo(map);
+
 L.control.layers(null, overlayMaps, {collapsed: false, position: 'topleft'}).addTo(map);
 
 function insertCategoryHeaders() {
@@ -143,7 +153,7 @@ scanBtn?.addEventListener('click', () => {
     scanBtn.innerText = "🔄 スキャン中..."; scanBtn.classList.add('disabled');
     const bounds = map.getBounds();
     setTimeout(() => {
-        Object.keys(layerDefs).forEach(key => { if (!immediateLayers.includes(key) && map.hasLayer(layers[key]) && rawData[key]) renderGeoJson(key, bounds); });
+        Object.keys(layerDefs).forEach(key => { if (map.hasLayer(layers[key]) && rawData[key]) renderGeoJson(key, bounds); });
         scanBtn.innerText = "📡 周囲をスキャン"; scanBtn.classList.remove('disabled');
     }, 600);
 });
