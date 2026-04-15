@@ -84,6 +84,11 @@ body.menu-open .leaflet-control-layers { left: 0 !important; }
 .leaflet-control-layers-overlays label { display: flex !important; align-items: center !important; margin-bottom: 8px !important; font-size: 15px; cursor: pointer; }
 .leaflet-control-layers-overlays input[type="checkbox"] { margin: 0 12px 0 0 !important; flex-shrink: 0 !important; width: 16px; height: 16px; cursor: pointer; }
 .leaflet-control-layers-overlays span { display: flex !important; align-items: center !important; }
+/* ベースマップラジオボタン揃え */
+.leaflet-control-layers-base label { display: flex !important; align-items: center !important; margin-bottom: 8px !important; font-size: 15px; cursor: pointer; }
+.leaflet-control-layers-base input[type="radio"] { margin: 0 12px 0 0 !important; flex-shrink: 0 !important; width: 16px; height: 16px; cursor: pointer; }
+.leaflet-control-layers-base span { display: flex !important; align-items: center !important; }
+.leaflet-control-layers-separator { border-top: 1px solid #ddd !important; margin: 8px 0 !important; }
 .leaflet-control-layers-toggle { display: none !important; }
 
 /* ⏳ ローディング設定 */
