@@ -1,19 +1,19 @@
 /**
- * 旅人の杖と救いの泉 Ver 3.0.0 (Vector SDK 突破版)
- * MapTiler公式SDK完全統合版
+ * 旅人の杖と救いの泉 Ver 3.0.0
+ * Vector SDK 安定版
  */
 
 // 1. マップの初期化
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
 
-// 2. MapTiler SDK を使ったカスタムマップ（Vector方式）
+// 2. MapTiler SDK レイヤー（Vector方式）
+// 🚨 key= の後ろに、ご自身のAPIキーを貼り付けてください。
 const MAPTILER_KEY = 'GloGcr9XQvZ6g4JrFj0x';
-const customMap = new L.MaptilerLayer({
+const customMap = L.maptilerLayer({
     apiKey: MAPTILER_KEY,
     style: 'https://api.maptiler.com/maps/019d8b1d-1989-74cd-b70b-2ba296c30f3e/style.json'
 });
 
-// カスタムマップを画面に表示
 customMap.addTo(map);
 map.attributionControl.setPosition('bottomleft');
 
@@ -59,7 +59,6 @@ const layerDefs = {
     shizenhodo: { url: 'TokaiNatureTrail_Route.geojson', style: getRouteStyle }, gokaido: { url: 'gokaido_routes.geojson', style: getRouteStyle }
 };
 
-// 即時読み込みするレイヤー
 const immediateLayers = ['keikan', 'tree', 'fudo', 'denken', 'fuchi', 'kanko', 'trail', 'shizenhodo', 'gokaido'];
 const rawData = {}; const layers = {};
 Object.keys(layerDefs).forEach(key => { layers[key] = L.layerGroup(); });
@@ -68,6 +67,7 @@ Object.keys(layerDefs).forEach(key => { layers[key] = L.layerGroup(); });
 function renderGeoJson(key, bounds = null) {
     layers[key].clearLayers();
     const def = layerDefs[key];
+    if (!rawData[key]) return;
     L.geoJSON(rawData[key], {
         filter: function(feature) {
             if (bounds && feature.geometry && feature.geometry.type === "Point") { return bounds.contains(L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0])); }
@@ -93,20 +93,19 @@ async function fetchAllData() {
 }
 fetchAllData();
 
-// 9. レイヤーコントロールの設定（背景切り替えなし、オーバーレイのみ）
+// 9. レイヤーコントロール
 const overlayMaps = {
     "♟️ 道標": layers.rel, "🌳 公園・遊具": layers.park, "🏟️ 公共施設": layers.com, "📚 文化施設": layers.mus, "🏃‍♂️ 体育施設": layers.gym, "🏯 文化財": layers.cul, "🚾 トイレ (赤丸)": layers.wc,
     "🏞️ 景観地区": layers.keikan, "🌲 景観重要建造物樹木": layers.tree, "📜 歴史的風土保存区域": layers.fudo, "🏘️ 伝統的建造物群保存地区": layers.denken, "🗺️ 歴史的風致重点地区": layers.fuchi, "🎆 観光資源": layers.kanko, 
     "🍽️ 喫茶店・レストラン": layers.restaurants, "🐾 トレイル.古道": layers.trail, "🛤️ 東海自然歩道": layers.shizenhodo, "🛣️ 五街道": layers.gokaido
 };
 
-// 初期表示するオーバーレイ
 layers.rel.addTo(map); layers.park.addTo(map); layers.com.addTo(map);
 layers.mus.addTo(map); layers.gym.addTo(map); layers.cul.addTo(map);
 
 L.control.layers(null, overlayMaps, {collapsed: false, position: 'topleft'}).addTo(map);
 
-// 10. 見出しの挿入ロジック
+// 10. 見出し
 function insertCategoryHeaders() {
     document.querySelectorAll('.custom-layer-header').forEach(el => el.remove());
     document.querySelectorAll('.leaflet-control-layers-overlays label').forEach(label => {
@@ -121,7 +120,7 @@ function insertCategoryHeaders() {
 insertCategoryHeaders();
 map.on('layeradd layerremove', () => setTimeout(insertCategoryHeaders, 10));
 
-// 11. スキャンボタンの設定
+// 11. スキャン
 const SCAN_ZOOM = 15;
 const scanBtn = document.getElementById('scan-btn');
 function updateScanBtn() {
@@ -142,13 +141,13 @@ scanBtn?.addEventListener('click', () => {
     }, 600);
 });
 
-// 12. UIボタン類
+// 12. UI
 document.getElementById('menu-btn')?.addEventListener('click', (e) => { e.stopPropagation(); document.body.classList.toggle('menu-open'); });
 document.getElementById('help-btn')?.addEventListener('click', () => { window.location.href = "help.html"; });
 document.getElementById('license-btn')?.addEventListener('click', () => { window.location.href = "license.html"; });
 document.getElementById('location-btn')?.addEventListener('click', () => { map.locate({setView: true, maxZoom: 16}); });
 
-// 13. ローディング画面の制御
+// 13. ローディング
 function hideLoadingScreen() {
     const s = document.getElementById('loading-screen');
     if(s && s.style.display !== 'none') { s.style.opacity = '0'; setTimeout(() => s.style.display = 'none', 800); }
@@ -156,5 +155,5 @@ function hideLoadingScreen() {
 window.addEventListener('load', () => setTimeout(hideLoadingScreen, 1500));
 setTimeout(hideLoadingScreen, 4000);
 
-// 14. 位置情報の取得
+// 14. 位置情報
 map.on('locationfound', (e) => { L.circleMarker(e.latlng, {radius: 8, fillColor: '#007BFF', color: '#fff', weight: 2, fillOpacity: 1}).addTo(map).bindPopup("現在地").openPopup(); });
