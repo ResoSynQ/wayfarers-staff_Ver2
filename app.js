@@ -1,12 +1,12 @@
 /**
- * 旅人の杖と救いの泉 Ver 2.0.24
- * 歴史的風致名称修正 ＆ ピン表示復活 ＆ 高速化設定
+ * 旅人の杖と救いの泉 Ver 2.0.25
+ * 名称取得修正 ＆ ピン表示復活 ＆ 黒枠除去対応
  */
 
 // 1. マップの初期化
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
 
-// 背景地図：MapTiler Topo (爆速先読み設定)
+// 背景地図：MapTiler Topo
 L.tileLayer('https://api.maptiler.com/maps/topo-v4/256/{z}/{x}/{y}.png?key=fRFSjkIcQ3GPpvRyLzxa', {
     maxZoom: 19,
     keepBuffer: 8,
@@ -24,10 +24,12 @@ const icons = {
     orange: new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] })
 };
 
-// 3. 名称取得の補助関数（バグ修正：A44_005 などの特殊項目に対応！）
+// 3. 名称取得の補助関数（🚨 1）歴史的風致の「計画名称」を優先表示！）
 function getFeatureName(p) {
     if (!p) return "名称未定";
-    let name = p.name || p.名称 || p.屋号 || p.地区名 || p.観光資源名 || p.指定名称 || p.文化財名 || p.通称 || 
+    // 計画名称、またはA44（歴史的風致）の計画名コード A44_002 を優先
+    let name = p.計画名称 || p.計画名 || p.A44_002 || p.name || p.名称 || p.屋号 || 
+               p.地区名 || p.観光資源名 || p.指定名称 || p.文化財名 || p.通称 || 
                p.A44_005 || p.A43_004 || p.A35b_003 || p.P12_002 || "名称未定";
     if (String(name) === "0" || name === "" || name === null) name = "名称未定";
     return name;
@@ -43,15 +45,15 @@ function getRouteStyle(feature) {
     return { color: "#FF1493", weight: 4, opacity: 0.8 };
 }
 
-// 5. レイヤーの定義
+// 5. レイヤーの定義（🚨 2）ピンのファイル名をリポジトリの実態に合わせて修正！）
 const layerDefs = {
-    rel: { url: 'OSM_relics_of_kinki_38142.geojson', icon: icons.blue },
-    park: { url: 'Gov-OSM_Park_30m_merge_17323.geojson', icon: icons.blue },
-    com: { url: 'Gov_Public Facilities-Gymnasiums_6278.geojson', icon: icons.green },
-    mus: { url: 'Gov_Cultural_Facilities-Libraries_6100.geojson', icon: icons.green },
-    gym: { url: 'Gov_cultural_6196.geojson', icon: icons.green },
-    cul: { url: 'Gov_cultural_6196.geojson', icon: icons.green },
-    wc: { url: 'Local_Toilet_Data_merged_30m_7218_point.geojson', isCircle: true },
+    rel: { url: 'rel.geojson', icon: icons.blue },
+    park: { url: 'park.geojson', icon: icons.blue },
+    com: { url: 'com.geojson', icon: icons.green },
+    mus: { url: 'mus.geojson', icon: icons.green },
+    gym: { url: 'gym.geojson', icon: icons.green },
+    cul: { url: 'cul.geojson', icon: icons.green },
+    wc: { url: 'wc.geojson', isCircle: true },
     keikan: { url: 'A35b_景観地区_近畿.geojson', style: {color: '#1E90FF', weight: 2, fillOpacity: 0.3} },
     tree: { url: 'A35c_景観重要建造物樹木_近畿.geojson', style: {color: '#32CD32', weight: 2, fillOpacity: 0.3} },
     fudo: { url: 'A42_歴史的風土保存区域_近畿.geojson', style: {color: '#8B4513', weight: 2, fillOpacity: 0.3} },
@@ -64,7 +66,6 @@ const layerDefs = {
     gokaido: { url: 'gokaido_routes.geojson', style: getRouteStyle }
 };
 
-// 💡 修正：ピン関係（rel, park, com...）も immediateLayers（初回読み込み）に追加して復活させたぜ！
 const immediateLayers = ['rel', 'park', 'com', 'mus', 'gym', 'cul', 'wc', 'keikan', 'tree', 'fudo', 'denken', 'fuchi', 'kanko', 'trail', 'shizenhodo', 'gokaido'];
 const rawData = {}; const layers = {};
 Object.keys(layerDefs).forEach(key => { layers[key] = L.layerGroup(); });
@@ -87,7 +88,6 @@ function renderGeoJson(key, bounds = null) {
         onEachFeature: function(feature, layer) { 
             const name = getFeatureName(feature.properties);
             layer.bindPopup(`<strong>${name}</strong>`); 
-            // 面積レイヤーにはツールチップ（ホバーで表示）も追加
             if (def.style) { layer.bindTooltip(name, { sticky: true }); }
         }
     }).addTo(layers[key]);
@@ -111,10 +111,10 @@ const overlayMaps = {
     "🍽️ 喫茶店・レストラン": layers.restaurants, "🐾 トレイル.古道": layers.trail, "🛤️ 東海自然歩道": layers.shizenhodo, "🛣️ 五街道": layers.gokaido
 };
 
-// 初期表示の設定
+// 初期表示の設定（ピンを復活！）
 layers.rel.addTo(map); layers.park.addTo(map); layers.com.addTo(map);
 layers.mus.addTo(map); layers.gym.addTo(map); layers.cul.addTo(map);
-layers.wc.addTo(map); // トイレも最初から表示
+layers.wc.addTo(map);
 
 L.control.layers(null, overlayMaps, {collapsed: false, position: 'topleft'}).addTo(map);
 
@@ -133,7 +133,7 @@ function insertCategoryHeaders() {
 insertCategoryHeaders();
 map.on('layeradd layerremove', () => setTimeout(insertCategoryHeaders, 10));
 
-// 10. スキャン機能（広域データ用）
+// 10. スキャン機能
 const SCAN_ZOOM = 15;
 const scanBtn = document.getElementById('scan-btn');
 function updateScanBtn() {
